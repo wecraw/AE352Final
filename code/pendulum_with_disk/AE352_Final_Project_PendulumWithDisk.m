@@ -15,7 +15,7 @@ theta0=0;%radians
 thetadot0=.05;%radians/second (give a kick to start the simulation
 phi0=0;
 phidot0=1;%radians/second
-
+tstep=0.05;
 %output vectors (appended on each run to show total run of pendulum)
 t_out=[];
 y_out=[];
@@ -25,7 +25,7 @@ for i=1:oscillations
     T=2*pi*sqrt(l/g)*(1+1/16*thetamax^2+11/3072*thetamax^4);%period
 
     infovec=[theta0 thetadot0 phi0 phidot0];
-    [t, y]= ode45(@thetafunc, [t0,T/2],infovec);%go from t=0 to when pendulum completes...
+    [t, y]= ode45(@thetafunc, t0:tstep:(T/2),infovec);%go from t=0 to when pendulum completes...
     %half an oscillation (back at the bottom)
     t_out=t;
     y_out=y;
@@ -46,7 +46,7 @@ for i=1:oscillations
     T=2*pi*sqrt(l/g)*(1+1/16*thetamax^2+11/3072*thetamax^4);
 
     infovec=[theta0 thetadotf phi0 phidot0];
-    [t, y]= ode45(@thetafunc, [tf,tf+T/2],infovec);%go from end of last run...
+    [t, y]= ode45(@thetafunc, tf:tstep:(tf+T/2),infovec);%go from end of last run...
     %to when pendulum completes half an oscillation (back at the bottom)
     tf=tf+T/2;
     t_out=[t_out;t]
