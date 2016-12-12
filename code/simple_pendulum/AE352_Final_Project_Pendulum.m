@@ -3,9 +3,9 @@ l=30;%pendulum length in meters
 g=9.8;%m/s^2
 m=2000;%mass in kilograms of disk
 J=m*l^2;%moment of inertia
-F_tire=100000;%Newtons
+
 L_tire=.5;%contact area of tire in meters
-oscillations=15;
+oscillations=20;
 
 t0=0;
 
@@ -17,7 +17,14 @@ t_out=[];
 y_out=[];
 tstep=0.05;
 for i=1:oscillations
+    if i<oscillations/2
+        F_tire=5000*i;
+    else
+        F_tire=-5000*(i-oscillations/2);
+    end
+    
     if i==1
+    
     thetamax=acos(1-thetadot0^2*l/(2*g)); %find max theta value (see notes for derivation)
     T=2*pi*sqrt(l/g)*(1+1/16*thetamax^2+11/3072*thetamax^4);%period
 
@@ -28,6 +35,7 @@ for i=1:oscillations
     y_out=y;
     tf=T/2;
     else
+       
     thetadot0=y(size(y,1),2);%load in new angular velocity at point of contact
     v=thetadot0*l;%velocity at bottom
     t_contact=L_tire/v; %approximate time of contact between ride and tire
@@ -69,9 +77,9 @@ figure(3);
 O = [0 0]; %set origin
 axis(gca,'equal'); %set aspect ratio of plot
 axis([-40 40 -40 20]); %plot limits
-grid on;
+grid off;
 
-w_rect=6;
+w_rect=8;
 l_rect=3;
 
 support_length=17;
@@ -83,18 +91,21 @@ for i=1:length(t_out);
     O_circ = viscircles(O,1); %circle to represent joint about which 
                                  %the pendulum oscilates
     
-    pend = line([O(1) P(1)],[O(2) P(2)],'LineWidth',2);
+    tire = viscircles([0,-l-2.75], 1, 'Color',[0 0 0],'LineWidth',5);
     
-    support1 = line([O(1) -support_length],[O(2) -support_height],'LineWidth',4);
+    pend = line([O(1) P(1)],[O(2) P(2)],'LineWidth',4);
     
-    support2 = line([O(1) support_length],[O(2) -support_height],'LineWidth',4);
+    support1 = line([O(1) -support_length],[O(2) -support_height],'LineWidth',8);
+    
+    support2 = line([O(1) support_length],[O(2) -support_height],'LineWidth',8);
 
+    tire_base = rectangle('Position',[-40 -l-20 80 17], 'FaceColor',[0 0 0]);
     
     rect.vertices=[-w_rect/2 -l_rect/2;w_rect/2 -l_rect/2; w_rect/2 l_rect/2; -w_rect/2 l_rect/2]; 
 
     rect.faces=[1 2 3 4]; %connect vertices
     
-    %rotation matrix for ani
+    %rotation matrix for animation
     theta =y_out(i,1);
     R=[cos(theta) sin(theta);-sin(theta) cos(theta)];
     ship = patch(rect,'Vertices',rect.vertices*R+repmat([P(1) P(2)],4,1),'FaceColor',[1 0 0]);
@@ -113,11 +124,8 @@ for i=1:length(t_out);
         delete(O_circ);
         delete(support1);
         delete(support2);
+        delete(tire_base);
+        delete(tire);
     end
     
-    
 end
-
-
-
-
