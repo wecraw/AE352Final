@@ -12,7 +12,7 @@ r=4.11;%disk radius in meters
 g=9.8;%m/s^2
 m=2000;%mass in kilograms of disk
 J=m*l^2;%moment of inertia
-F=4000;%Newtons
+F=5000;%Newtons
 L_tire=.5;%contact area of tire in meters
 T_disk=1000;%torque on disk
 J_disk=.5*m*r^2;%moment of inertia of disk in Newton-meters
@@ -32,7 +32,11 @@ y_out=[];
 plot_outputs=zeros(3,706,Numpeople);%initialize plot outputs
 
 for i=1:oscillations
-    F_tire=i*F;%increase force of tire with each run (smooth start up compared to constant force)
+    if i<oscillations/2
+        F_tire=i*F;
+    else
+        F_tire=-F*(i-oscillations/2);
+    end
     if i==1
     thetamax=acos(1-thetadot0^2*l/(2*g)); %find max theta value (see notes for derivation)
     T=2*pi*sqrt(l/g)*(1+1/16*thetamax^2+11/3072*thetamax^4);%period
